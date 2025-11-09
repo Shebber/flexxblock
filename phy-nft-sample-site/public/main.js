@@ -10,7 +10,7 @@
   function byId(id) { return document.getElementById(id); }
 
   async function loadData() {
-   const res = await fetch('assets/data/artworks.json', { cache: 'no-store' });
+   const res = await fetch('/data/artworks.json', { cache: 'no-store' });
     if (!res.ok) throw new Error('Kann /data/artworks.json nicht laden');
     return res.json();
   }
