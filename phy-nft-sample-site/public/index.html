@@ -9,6 +9,40 @@
   </head>
   <body>
     <main id="app" class="container"></main>
-    <script src="./script.js"></script>
+    <script>
+(async function () {
+  const app = document.querySelector('#app');
+
+  async function render() {
+    const res = await fetch('/data/artworks.json', { cache: 'no-store' });
+    const artworks = await res.json();
+
+    const id = location.pathname.split('/').pop();
+    const art = artworks[id];
+
+    if (!art) {
+      app.innerHTML = '<h2>Artwork not found</h2>';
+      return;
+    }
+
+    app.innerHTML = `
+      <div style="text-align:center;padding:20px;">
+        <h1>${art.title}</h1>
+        <img src="/${art.image}" style="max-width:90%;border-radius:10px;">
+        <p><b>Chain:</b> ${art.chain}</p>
+        <p><b>Contract:</b> ${art.contract}</p>
+        <p><b>Token ID:</b> ${art.tokenId}</p>
+        <p><b>Owner:</b> ${art.owner}</p>
+        <p><a href="${art.opensea}" target="_blank">View on OpenSea</a></p>
+        <p><a href="${art.ipfs}" target="_blank">IPFS Link</a></p>
+        <p>${art.notes}</p>
+      </div>
+    `;
+  }
+
+  await render();
+})();
+</script>
+
   </body>
 </html>
