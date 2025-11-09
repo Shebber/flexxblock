@@ -1,34 +1,49 @@
-<script>
 (async function () {
   const app = document.querySelector('#app');
 
-  async function render() {
+  function byId(id){ return document.getElementById(id); }
+
+  async function loadData(){
     const res = await fetch('/data/artworks.json', { cache: 'no-store' });
-    const artworks = await res.json();
+    if(!res.ok) throw new Error('Kann /data/artworks.json nicht laden');
+    return res.json();
+  }
 
-    const id = location.pathname.split('/').pop();
-    const art = artworks[id];
+  function currentId(){
+    const parts = location.pathname.replace(/^\/+|\/+$/g,'').split('/');
+    // erwartet /verify/<id>, sonst default "001"
+    const idx = parts.indexOf('verify');
+    return (idx>=0 && parts[idx+1]) ? parts[idx+1] : '001';
+  }
 
-    if (!art) {
-      app.innerHTML = '<h2>Artwork not found</h2>';
+  function safe(x){ return String(x ?? ''); }
+
+  async function render(){
+    let data; try{ data = await loadData(); } catch(e){
+      app.innerHTML = `<div style="padding:24px">Fehler: ${e.message}</div>`; return;
+    }
+    const id = currentId();
+    const art = data[id];
+    if(!art){
+      app.innerHTML = `<div style="padding:24px"><h2>Artwork nicht gefunden</h2><div class="muted">ID: ${id}</div></div>`;
       return;
     }
 
-    app.innerHTML = `
-      <div style="text-align:center;padding:20px;">
-        <h1>${art.title}</h1>
-        <img src="/${art.image}" style="max-width:90%;border-radius:10px;">
-        <p><b>Chain:</b> ${art.chain}</p>
-        <p><b>Contract:</b> ${art.contract}</p>
-        <p><b>Token ID:</b> ${art.tokenId}</p>
-        <p><b>Owner:</b> ${art.owner}</p>
-        <p><a href="${art.opensea}" target="_blank">View on OpenSea</a></p>
-        <p><a href="${art.ipfs}" target="_blank">IPFS Link</a></p>
-        <p>${art.notes}</p>
-      </div>
-    `;
+    // Bild
+    const img = byId('artImage');
+    img.src = `/${safe(art.image)}`;
+    img.alt = safe(art.title);
+
+    // Textfelder
+    byId('title').textContent = safe(art.title);
+    byId('chain').textContent = safe(art.chain);
+    byId('contract').querySelector('.code')?.replaceWith(Object.assign(document.createElement('span'), {className:'code', textContent:safe(art.contract)}));
+    byId('token').textContent = `#${safe(art.tokenId)}`;
+    byId('owner').querySelector('.code')?.replaceWith(Object.assign(document.createElement('span'), {className:'code', textContent:safe(art.owner)}));
+    byId('mkt').href = safe(art.opensea || '#');
+    byId('ipfs').href = safe(art.ipfs || '#');
+    byId('notes').textContent = safe(art.notes || '');
   }
 
   await render();
 })();
-</script>
