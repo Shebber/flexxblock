@@ -2,7 +2,7 @@
   "version": 2,
   "public": true,
   "builds": [
-    { "src": "phy-nft-sample-site/public/**/*", "use": "@vercel/static" }
+    { "src": "phy-nft-sample-site/**/*", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/verify/(.*)", "dest": "/index.html" },
