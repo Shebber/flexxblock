@@ -1,14 +1,61 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
-  <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>PHY•NFT – Scan-to-Verify Sample</title>
-    <meta name="description" content="Physische Kunst, digitale Identität. NFC-verknüpfte Acrylprints mit Verify-Seite.">
-    <link rel="stylesheet" href="./style.css">
-  </head>
-  <body>
-    <main id="app" class="container"></main>
-    <script src="/main.js" type="module"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flexxblock – Phygital NFT Verification</title>
+  <meta name="description" content="Verifiziere physische Kunstwerke mit Flexxblock – NFT-Linked Acrylic Prints mit digitaler Identität." />
+
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      margin: 0;
+      background: #0e0e0e;
+      color: #f1f1f1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    #app {
+      text-align: center;
+      max-width: 800px;
+      padding: 20px;
+    }
+    h1 {
+      font-weight: 500;
+      margin-bottom: 0.5em;
+    }
+    img {
+      max-width: 90%;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.05);
+    }
+    a {
+      color: #42aaff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    footer {
+      margin-top: 2em;
+      font-size: 0.85em;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>Physische Kunst, digitale Identität</h1>
+    <p>Scanne den RFID-Tag oder öffne eine Verify-Seite, um Details zu deinem Werk anzuzeigen.</p>
+  </div>
+
+  <!-- Lädt dein externes Script -->
+  <script src="/main.js" type="module"></script>
+
+  <footer>
+    © 2025 Flexxblock – powered by Rock Shebbich
+  </footer>
+</body>
 </html>
