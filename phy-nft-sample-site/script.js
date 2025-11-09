@@ -31,7 +31,7 @@
   function safe(t){ return String(t ?? '').replace(/[&<>]/g, s=>({ '&':'&amp;','<':'&lt;','>':'&gt;'}[s])); }
 
   async function loadData(){
-    const r = await fetch('/data/artworks.json', {cache:'no-store'});
+    const r = await fetch('phy-nft-sample-site/data/artworks.json', {cache:'no-store'});
     if(!r.ok) throw new Error('Daten nicht gefunden');
     return r.json();
   }
