@@ -1,0 +1,13 @@
+{
+  "001": {
+    "title": "Genesis Sample \u2013 Acrylic Print",
+    "image": "assets/placeholder.svg",
+    "chain": "ApeChain (test)",
+    "contract": "0xABCDEF...1234",
+    "tokenId": "1",
+    "owner": "0xF00...BEE",
+    "opensea": "https://opensea.io/assets/0xABCDEF...1234/1",
+    "ipfs": "ipfs://bafybeigdyr...",
+    "notes": "Demo-Eintrag. Ersetze die Werte f\u00fcr dein echtes Sample."
+  }
+}
