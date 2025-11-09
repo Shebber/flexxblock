@@ -14,7 +14,7 @@
   }
 
   async function loadData() {
-    const res = await fetch('./data/artworks.json', { cache: 'no-store' });
+    const res = await fetch('/data/artworks.json', { cache: 'no-store' });
     if (!res.ok) throw new Error('Daten nicht gefunden');
     return res.json();
   }
