@@ -1,8 +1,12 @@
 {
   "rewrites": [
     {
-      "source": "/(data|assets|script\\.js|style\\.css)(.*)",
-      "destination": "/$1$2"
+      "source": "/(data|assets)/.*",
+      "destination": "/$1/$2"
+    },
+    {
+      "source": "/(style\\.css|script\\.js)",
+      "destination": "/$1"
     },
     {
       "source": "/(.*)",
