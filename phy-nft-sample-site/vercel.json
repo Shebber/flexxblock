@@ -1,5 +1,8 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/((?!assets/|data/|style\\.css|script\\.js).*)",
+      "destination": "/index.html"
+    }
   ]
 }
