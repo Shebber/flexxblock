@@ -1,7 +1,10 @@
 {
   "version": 2,
-  "outputDirectory": "phy-nft-sample-site/public",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+  "builds": [
+    { "src": "phy-nft-sample-site/public/**/*", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/verify/(.*)", "dest": "/index.html" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
