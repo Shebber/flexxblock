@@ -48,7 +48,7 @@
     // Bild
     const img = byId('artImage');
     if (img) {
-      img.src = `/${safe(art.image)}`;
+      img.src = safe(art.image);
       img.alt = safe(art.title);
     }
 
