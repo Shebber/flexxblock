@@ -9,5 +9,6 @@
   "routes": [
     { "src": "/verify/(.*)", "dest": "/index.html" },
     { "src": "/(.*)", "dest": "/index.html" }
-  ]
+  ],
+  "outputDirectory": "phy-nft-sample-site/public"
 }
