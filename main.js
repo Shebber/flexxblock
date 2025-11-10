@@ -52,10 +52,14 @@
       return;
     }
 
-    // Bild setzen
+    // Absoluter Bildpfad (wichtig bei /verify/…)
     const img = byId('artImage');
     if (img) {
-      img.src = safe(art.image);
+      let imgPath = safe(art.image);
+      if (!imgPath.startsWith('http')) {
+        imgPath = '/' + imgPath.replace(/^\/+/, '');
+      }
+      img.src = imgPath;
       img.alt = safe(art.title);
     }
 
@@ -70,17 +74,15 @@
     const ownerEl = byId('owner')?.querySelector('.code');
     if (ownerEl) ownerEl.textContent = safe(art.owner);
 
-    // Links
-    // Opensea-Link bleibt wie er ist
+    // Marktplatz-Link
     byId('mkt').href = safe(art.opensea || '#');
 
-     // IPFS-Link konvertieren, falls nötig
+    // IPFS-Link (kompatibel umwandeln)
     let ipfsLink = safe(art.ipfs || '#');
     if (ipfsLink.startsWith('ipfs://')) {
-    ipfsLink = ipfsLink.replace('ipfs://', 'https://ipfs.io/ipfs/');
-     }
-     byId('ipfs').href = ipfsLink;
-
+      ipfsLink = ipfsLink.replace('ipfs://', 'https://ipfs.io/ipfs/');
+    }
+    byId('ipfs').href = ipfsLink;
 
     // Notizen
     byId('notes').textContent = safe(art.notes || '');
