@@ -71,8 +71,16 @@
     if (ownerEl) ownerEl.textContent = safe(art.owner);
 
     // Links
+    // Opensea-Link bleibt wie er ist
     byId('mkt').href = safe(art.opensea || '#');
-    byId('ipfs').href = safe(art.ipfs || '#');
+
+     // IPFS-Link konvertieren, falls nötig
+    let ipfsLink = safe(art.ipfs || '#');
+    if (ipfsLink.startsWith('ipfs://')) {
+    ipfsLink = ipfsLink.replace('ipfs://', 'https://ipfs.io/ipfs/');
+     }
+     byId('ipfs').href = ipfsLink;
+
 
     // Notizen
     byId('notes').textContent = safe(art.notes || '');
