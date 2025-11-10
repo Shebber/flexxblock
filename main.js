@@ -1,7 +1,7 @@
 (async function () {
   const app = document.querySelector('main.wrap');
 
-  // Fallback-Sicherheitscheck
+  // Sicherstellen, dass das Ziel-Element existiert
   if (!app) {
     console.error("⚠️ Kein <main class='wrap'> im DOM gefunden – Abbruch.");
     return;
@@ -9,20 +9,26 @@
 
   function byId(id) { return document.getElementById(id); }
 
+  // JSON laden – absoluter Pfad, damit es auch bei /verify/... funktioniert
   async function loadData() {
-   const res = await fetch('/data/artworks.json', { cache: 'no-store' });
-    if (!res.ok) throw new Error('Kann /data/artworks.json nicht laden');
+    const res = await fetch('/data/artworks.json', { cache: 'no-store' });
+    if (!res.ok) {
+      throw new Error(`Kann /data/artworks.json nicht laden (Status ${res.status})`);
+    }
     return res.json();
   }
 
+  // ID aus der URL ermitteln (z. B. /verify/001 → "001")
   function currentId() {
     const parts = location.pathname.replace(/^\/+|\/+$/g, '').split('/');
     const idx = parts.indexOf('verify');
     return (idx >= 0 && parts[idx + 1]) ? parts[idx + 1] : '001';
   }
 
+  // Sicherheitsfunktion gegen undefined/null
   function safe(x) { return String(x ?? ''); }
 
+  // Haupt-Rendering
   async function render() {
     let data;
     try {
@@ -31,6 +37,7 @@
       app.innerHTML = `<div style="padding:24px;color:#fff">
         Fehler: ${e.message}
       </div>`;
+      console.error(e);
       return;
     }
 
@@ -45,7 +52,7 @@
       return;
     }
 
-    // Bild
+    // Bild setzen
     const img = byId('artImage');
     if (img) {
       img.src = safe(art.image);
@@ -55,13 +62,19 @@
     // Textfelder
     byId('title').textContent = safe(art.title);
     byId('chain').textContent = safe(art.chain);
+
     const contractEl = byId('contract')?.querySelector('.code');
     if (contractEl) contractEl.textContent = safe(art.contract);
-    byId('token').textContent = `#${safe(art.tokenId)}`;
+
+    byId('token').textContent = safe(art.tokenId);
     const ownerEl = byId('owner')?.querySelector('.code');
     if (ownerEl) ownerEl.textContent = safe(art.owner);
+
+    // Links
     byId('mkt').href = safe(art.opensea || '#');
     byId('ipfs').href = safe(art.ipfs || '#');
+
+    // Notizen
     byId('notes').textContent = safe(art.notes || '');
   }
 
