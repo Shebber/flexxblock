@@ -33,9 +33,11 @@
       float glitch = step(0.97, fract(sin(t*53.0)*43758.5453));
       float g = n1*0.55 + n2*0.30 + scan + drift + bar*glitch;
 
-      vec3 base = vec3(0.02, 0.0, 0.04);
-      vec3 mag  = vec3(1.0, 0.0, 1.0);
-      vec3 c = base + mag * (0.26 + g*0.36);
+      vec3 base = vec3(0.12, 0.0, 0.10);       // Grundton: leicht pink-violett
+      vec3 mag  = vec3(1.0, 0.3, 1.0);         // Pink mit kleinem Rotanteil
+      vec3 glow = vec3(1.0, 0.8, 1.0);         // sanfter Weiß-Pink-Schimmer
+      vec3 c = base + mag * (0.30 + g*0.40) + glow * 0.10;
+
 
       vec2 d = uv-0.5; float vig = 1.0 - dot(d,d)*1.2;
       c *= clamp(vig, 0.15, 1.0);
