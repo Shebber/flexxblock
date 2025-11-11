@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "public": true,
+  "routes": [
+    { "src": "/api/data", "dest": "/api/data.js" },
+    { "handle": "filesystem" },
+    { "src": "/verify/.*", "dest": "/index.html" },
+    { "src": "^/$", "dest": "/index.html" }
+  ]
+}
