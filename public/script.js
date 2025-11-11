@@ -1,93 +1,64 @@
-(async function () {
-  const app = document.querySelector('#app');
+(function(){
+  const canvas = document.getElementById('gl');
+  const gl = canvas.getContext('webgl', { alpha:true, antialias:false });
+  if(!gl) return;
 
-  async function render() {
-    const path = location.pathname.replace(/^\/+|\/+$/g, '').split('/');
-    if (path[0] === 'verify' && path[1]) {
-      return renderVerify(path[1]);
+  const vertSrc = `
+    attribute vec2 a;
+    void main(){ gl_Position = vec4(a, 0.0, 1.0); }
+  `;
+
+  const fragSrc = `
+    precision highp float;
+    uniform vec2 r;
+    uniform float t;
+    float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453123); }
+    float noise(vec2 p){
+      vec2 i=floor(p), f=fract(p);
+      float a=hash(i), b=hash(i+vec2(1,0)), c=hash(i+vec2(0,1)), d=hash(i+vec2(1,1));
+      vec2 u=f*f*(3.-2.*f);
+      return mix(a,b,u.x)+(c-a)*u.y*(1.-u.x)+(d-b)*u.x*u.y;
     }
-    return renderLanding();
-  }
-
-  function setHTML(html) {
-    app.innerHTML = html;
-  }
-
-  async function loadData() {
-    const res = await fetch('/data/artworks.json', { cache: 'no-store' });
-    if (!res.ok) throw new Error('Daten nicht gefunden');
-    return res.json();
-  }
-
-  function brand() {
-    return `
-      <div class="header">
-        <div class="logo">Φ</div>
-        <div class="brand">PHY•NFT</div>
-      </div>`;
-  }
-
-  function renderLanding() {
-    const baseURL = location.origin;
-    const demoURL = baseURL + '/verify/001';
-    setHTML(`
-      ${brand()}
-      <div class="container grid">
-        <div class="card">
-          <div class="badge">MVP • Scan-to-Verify</div>
-          <h1 class="h1">Physische Kunst, digitale Identität</h1>
-          <p class="lead">Scanne das Werk mit deinem Smartphone oder öffne die Verify-URL. Dieses MVP rendert Metadaten aus einer lokalen JSON-Datei.</p>
-          <div class="flex">
-            <a class="btn" href="./verify/001">Demo ansehen</a>
-            <button class="btn copy" onclick="navigator.clipboard.writeText('${demoURL}')">Demo-URL kopieren</button>
-          </div>
-        </div>
-        <div class="hero card"><img src="./assets/placeholder.svg" alt="Artwork placeholder"></div>
-      </div>
-    `);
-  }
-
-  async function renderVerify(id) {
-    let data, item;
-    try {
-      data = await loadData();
-      item = data[id];
-    } catch (e) {}
-
-    if (!item) {
-      return setHTML(`
-        ${brand()}
-        <div class="container">
-          <div class="card alert err">
-            <b>Artwork nicht gefunden.</b><br>
-            ID: <span class="code">${id}</span>
-          </div>
-        </div>
-      `);
+    void main(){
+      vec2 uv=gl_FragCoord.xy/r.xy;
+      float n=noise(uv*8.0+vec2(t*0.2,t*0.1));
+      vec3 col=vec3(0.02,0.0,0.05)+vec3(1.0,0.0,1.0)*n*0.4;
+      gl_FragColor=vec4(col,1.0);
     }
+  `;
 
-    const shareURL = location.origin + '/verify/' + encodeURIComponent(id);
-    setHTML(`
-      ${brand()}
-      <div class="container grid">
-        <div class="card">
-          <div class="badge">Verify • ID ${id}</div>
-          <h1 class="h1">${item.title}</h1>
-          <div class="kv"><div class="k">Chain</div><div>${item.chain}</div></div>
-          <div class="kv"><div class="k">Contract</div><div class="code">${item.contract}</div></div>
-          <div class="kv"><div class="k">Token</div><div>#${item.tokenId}</div></div>
-          <div class="kv"><div class="k">Owner</div><div class="code">${item.owner}</div></div>
-          <div class="kv"><div class="k">IPFS</div><div class="code">${item.ipfs}</div></div>
-          <div class="flex" style="margin-top:14px">
-            ${item.opensea ? `<a class="btn" target="_blank" href="${item.opensea}">Auf Marktplatz ansehen</a>` : ''}
-            <button class="btn copy" onclick="navigator.clipboard.writeText('${shareURL}')">Link kopieren</button>
-          </div>
-        </div>
-        <div class="hero card"><img src="./${item.image}" alt="Artwork image"></div>
-      </div>
-    `);
+  function compile(type, src){
+    const s=gl.createShader(type); gl.shaderSource(s,src); gl.compileShader(s);
+    return s;
   }
+  const vs=compile(gl.VERTEX_SHADER,vertSrc);
+  const fs=compile(gl.FRAGMENT_SHADER,fragSrc);
+  const prog=gl.createProgram();
+  gl.attachShader(prog,vs); gl.attachShader(prog,fs); gl.linkProgram(prog);
+  gl.useProgram(prog);
 
-  await render();
-  window.addEventListener('popstate', render);
+  const a=gl.getAttribLocation(prog,'a');
+  const ur=gl.getUniformLocation(prog,'r');
+  const ut=gl.getUniformLocation(prog,'t');
+  const buf=gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(a);
+  gl.vertexAttribPointer(a,2,gl.FLOAT,false,0,0);
+
+  function resize(){
+    canvas.width=innerWidth; canvas.height=innerHeight;
+    gl.viewport(0,0,gl.drawingBufferWidth,gl.drawingBufferHeight);
+  }
+  window.addEventListener('resize',resize);
+  resize();
+
+  const start=performance.now();
+  (function loop(){
+    const t=(performance.now()-start)/1000;
+    gl.uniform2f(ur,canvas.width,canvas.height);
+    gl.uniform1f(ut,t);
+    gl.drawArrays(gl.TRIANGLES,0,6);
+    requestAnimationFrame(loop);
+  })();
 })();
