@@ -9,15 +9,15 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="icon" href="data:,">
   <style>
-    :root{
-      --bg:#0a0a0a;
-      --panel:#111111;
-      --text:#f1f1f1;
-      --muted:#9aa4b2;
-      --magenta:#ff00ff; /* 100% Magenta */
-      --ok:#00ffa7;
-      --border:#1f1f1f;
-    }
+    :root {
+  --bg: #180016;            /* etwas heller, magenta-schwarz */
+  --panel: #1a0018;
+  --text: #f5f1f5;
+  --muted: #b687c7;
+  --magenta: #ff33ff;       /* helleres Magenta */
+  --ok: #00ffa7;
+  --border: #330033;
+     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
@@ -37,12 +37,31 @@
     }
 
     /* Header mit Wordmark (Primär) – nie mit Icon kombinieren */
-    header{
-      position:fixed; top:18px; left:18px; z-index:3; display:flex; align-items:center; gap:14px;
-      letter-spacing:0.08em; text-transform:uppercase; font-weight:600;
-      filter:drop-shadow(0 0 6px rgba(255,0,255,0.2));
-      user-select:none;
-    }
+    header {
+  position: fixed;
+  top: 36px;                /* vorher 18px */
+  left: 18px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  filter: drop-shadow(0 0 6px rgba(255,0,255,0.2));
+  user-select: none;
+}
+    @media (max-width: 900px) {
+  .art img {
+    width: 70%;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
     .wordmark{ display:inline-block; line-height:0; }
     .wordmark img{ height:65px; width:auto; display:block; transform:scale(2.5); transform-origin:left center; }
     .tag{font-weight:400;color:var(--muted);border:1px solid var(--border); padding:4px 8px; border-radius:10px}
