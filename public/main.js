@@ -11,7 +11,7 @@
 
   // JSON laden – absoluter Pfad, damit es auch bei /verify/... funktioniert
   async function loadData() {
-    const res = await fetch('/data/artworks.json', { cache: 'no-store' });
+    const res = await fetch('/api/data', { cache: 'no-store' });
     if (!res.ok) {
       throw new Error(`Kann /data/artworks.json nicht laden (Status ${res.status})`);
     }
