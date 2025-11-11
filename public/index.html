@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Flexblock – Verify</title>
-  <meta name="description" content="Verify-Seite für Flexblock – phygitale NFT-Acrylprints mit digitaler Identität." />
+  <title>Flexxblock – Verify</title>
+  <meta name="description" content="Verify-Seite für Flexxblock – phygitale NFT-Acrylprints mit digitaler Identität." />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&display=swap" rel="stylesheet">
-  <link rel="icon" href="data:,">
+
   <style>
-    :root {
-  --bg: #180016;            /* etwas heller, magenta-schwarz */
-  --panel: #1a0018;
-  --text: #f5f1f5;
-  --muted: #b687c7;
-  --magenta: #ff33ff;       /* helleres Magenta */
-  --ok: #00ffa7;
-  --border: #330033;
-     }
+    :root{
+      --bg:#180016;
+      --panel:#1a0018;
+      --text:#f5f1f5;
+      --muted:#b687c7;
+      --magenta:#ff33ff;
+      --ok:#00ffa7;
+      --border:#330033;
+    }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
@@ -25,62 +25,39 @@
       font-family:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       overflow-x:hidden;
     }
-    /* Fullscreen WebGL Canvas */
-    #gl{ position:fixed; inset:0; width:100vw; height:100vh; display:block; z-index:0; }
-    /* halbtransparente Overlay-Scrim damit UI lesbarer bleibt */
+
+    #gl{
+      position:fixed; inset:0; width:100vw; height:100vh; display:block; z-index:0;
+    }
     .scrim{
       position:fixed; inset:0; pointer-events:none; z-index:1;
-      background:
-        radial-gradient(1200px 800px at 70% 20%, rgba(255,0,255,0.10), transparent 60%),
-        linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.6));
+      background: radial-gradient(1200px 800px at 70% 20%, rgba(255,0,255,0.10), transparent 60%),
+                  linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.5));
       mix-blend-mode:screen;
     }
 
-    /* Header mit Wordmark (Primär) – nie mit Icon kombinieren */
-    header {
-  position: fixed;
-  top: 36px;                /* vorher 18px */
-  left: 18px;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-weight: 600;
-  filter: drop-shadow(0 0 6px rgba(255,0,255,0.2));
-  user-select: none;
-}
-    @media (max-width: 900px) {
-  .art img {
-    width: 70%;
-    height: auto;
-    margin: 0 auto;
-    display: block;
-  }
-  .grid {
-    grid-template-columns: 1fr;
-    justify-items: center;
-  }
-    .wordmark{ display:inline-block; line-height:0; }
-    .wordmark img{ height:65px; width:auto; display:block; transform:scale(2.5); transform-origin:left center; }
+    header{
+      position:fixed; top:36px; left:18px; z-index:3;
+      display:flex; align-items:center; gap:14px;
+      letter-spacing:0.08em; text-transform:uppercase; font-weight:600;
+      filter:drop-shadow(0 0 6px rgba(255,0,255,0.25));
+      user-select:none;
+    }
+    .wordmark svg{ height:26px; width:auto; display:block; }
     .tag{font-weight:400;color:var(--muted);border:1px solid var(--border); padding:4px 8px; border-radius:10px}
 
-    /* Icon nur als Wasserzeichen */
     .icon-watermark{
       position:fixed; right:2vw; bottom:2vh; z-index:1; opacity:0.06; filter:blur(0.2px);
       width:min(42vw,520px); height:auto; pointer-events:none;
     }
-    .icon-watermark img{ width:100%; height:auto; display:block; }
 
-    /* Haupt-Container */
     .wrap{
       position:relative; z-index:2; min-height:100dvh;
       display:grid; place-items:center; padding:96px 20px 40px;
     }
     .card{
       width:min(1100px, 92vw);
-      background:linear-gradient(180deg, rgba(17,17,17,0.75), rgba(10,10,10,0.85));
+      background:linear-gradient(180deg, rgba(26,0,24,0.75), rgba(10,0,10,0.85));
       border:1px solid var(--border);
       border-radius:20px; padding:24px; backdrop-filter:blur(6px);
       box-shadow: 0 12px 40px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,0,255,0.06);
@@ -92,7 +69,10 @@
       display:grid; gap:20px;
       grid-template-columns: 1.2fr .8fr;
     }
-    @media (max-width: 900px){ .grid{ grid-template-columns:1fr } }
+    @media (max-width: 900px){
+      .grid{ grid-template-columns:1fr; justify-items:center; }
+      .art img{ width:70%; height:auto; margin:0 auto; display:block; }
+    }
 
     .art{
       border:1px solid var(--border); border-radius:16px; overflow:hidden; position:relative;
@@ -106,28 +86,13 @@
     @keyframes scan{ from{ transform:translateY(-100%) } to{ transform:translateY(100%) } }
 
     .meta{ display:grid; gap:12px; align-content:start; }
-    .h1{
-      font-size: clamp(22px, 2.6vw, 32px);
-      margin:0 0 6px; letter-spacing:.02em;
-      text-shadow:0 0 12px rgba(255,0,255,0.15);
-    }
+    .h1{ font-size: clamp(22px, 2.6vw, 32px); margin:0 0 6px; letter-spacing:.02em; text-shadow:0 0 12px rgba(255,0,255,0.15); }
     .badge{
       display:inline-flex; align-items:center; gap:8px; color:var(--magenta);
       border:1px solid rgba(255,0,255,0.3); padding:6px 10px; border-radius:999px; font-size:12px;
       background:linear-gradient(180deg, rgba(255,0,255,0.10), rgba(255,0,255,0.02));
       box-shadow:inset 0 0 20px rgba(255,0,255,0.08);
-      animation: glitchPulse 1.8s ease-in-out infinite;
     }
-    @keyframes glitchPulse{
-      0%,100%{ transform:translateX(0) }
-      45%{ transform:translateX(0) }
-      46%{ transform:translateX(-1px) }
-      47%{ transform:translateX(1.6px) }
-      48%{ transform:translateX(-0.6px) }
-      49%{ transform:translateX(0.8px) }
-      50%{ transform:translateX(0) }
-    }
-
     .kv{ display:grid; grid-template-columns:130px 1fr; gap:8px; font-size:14px; }
     .k{ color:var(--muted) }
     .v .code{ background:#0d0d0d; border:1px dashed #262626; padding:4px 6px; border-radius:8px; }
@@ -143,48 +108,28 @@
     .muted{ color:var(--muted); font-size:12px }
 
     footer{ position:fixed; right:18px; top:18px; z-index:3; color:var(--muted); font-size:12px }
-
-    /* kleine, aggressive Glitches über dem gesamten UI */
-    .glitch-layer{
-      position:fixed; inset:0; pointer-events:none; z-index:2; mix-blend-mode:screen;
-      background:
-        repeating-linear-gradient(0deg, rgba(255,0,255,0.08) 0, rgba(255,0,255,0.08) 1px, transparent 1px, transparent 2px),
-        linear-gradient(90deg, rgba(255,0,255,0.06), transparent 60%),
-        radial-gradient(800px 400px at 20% 60%, rgba(255,0,255,0.12), transparent 70%);
-      animation: drift 11s linear infinite;
-    }
-    @keyframes drift{ 0%{ transform: translateX(0) } 100%{ transform: translateX(-6%) } }
-
-    /* progressive Fade-in Steps für Metadaten */
-    .step{ opacity:0; transform:translateY(6px); animation: stepIn .5s both }
-    .step2{ animation-delay:.12s }
-    .step3{ animation-delay:.18s }
-    .step4{ animation-delay:.24s }
-    .step5{ animation-delay:.30s }
-    .step6{ animation-delay:.36s }
-    @keyframes stepIn{ to{ opacity:1; transform:none } }
   </style>
 </head>
+
 <body>
-  <!-- WebGL Noise Hintergrund -->
   <canvas id="gl"></canvas>
   <div class="scrim"></div>
-  <div class="glitch-layer"></div>
 
-  <!-- Header: Wordmark (Primär) -->
   <header>
     <span class="wordmark">
-      <img src="https://www.rockshebbich.de/flexblock/flexblock_wordmark_col.svg" alt="Flexblock Wordmark">
+      <svg viewBox="0 0 680 120" xmlns="http://www.w3.org/2000/svg" aria-label="Flexxblock Wordmark">
+        <text x="0" y="86" font-family="IBM Plex Mono, monospace" font-size="82" font-weight="600" letter-spacing="4" fill="#ff33ff">FLEXXBLOCK</text>
+      </svg>
     </span>
     <span class="tag">verify</span>
   </header>
 
-  <!-- Icon als Wasserzeichen (sekundär, nie kombiniert im Header) -->
   <div class="icon-watermark" aria-hidden="true">
-    <img src="https://www.rockshebbich.de/flexblock/flexblock_icon_sw.svg" alt="">
+    <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" fill="#ffffff">
+      <rect x="24" y="24" width="208" height="208" rx="28" ry="28" fill="#ffffff"/>
+    </svg>
   </div>
 
-  <!-- Content -->
   <main class="wrap">
     <section class="card">
       <div class="grid">
@@ -193,37 +138,27 @@
           <div class="scanline"></div>
         </div>
         <div class="meta">
-          <div class="badge step">● verified • on-chain linked</div>
-          <h1 id="title" class="h1 step2">Lade Daten…</h1>
-
-          <div class="kv step3">
-            <div class="k">Chain</div><div id="chain" class="v"></div>
-          </div>
-          <div class="kv step4">
-            <div class="k">Contract</div><div id="contract" class="v"><span class="code"></span></div>
-          </div>
-          <div class="kv step5">
-            <div class="k">Token</div><div id="token" class="v"></div>
-          </div>
-          <div class="kv step6">
-            <div class="k">Owner</div><div id="owner" class="v"><span class="code"></span></div>
-          </div>
-
-          <div class="actions step6">
+          <div class="badge">● verified • on-chain linked</div>
+          <h1 id="title" class="h1">Lade Daten…</h1>
+          <div class="kv"><div class="k">Chain</div><div id="chain" class="v"></div></div>
+          <div class="kv"><div class="k">Contract</div><div id="contract" class="v"><span class="code"></span></div></div>
+          <div class="kv"><div class="k">Token</div><div id="token" class="v"></div></div>
+          <div class="kv"><div class="k">Owner</div><div id="owner" class="v"><span class="code"></span></div></div>
+          <div class="actions">
             <a id="mkt" class="btn" href="#" target="_blank" rel="noopener">Marktplatz öffnen</a>
             <a id="ipfs" class="btn" href="#" target="_blank" rel="noopener">IPFS</a>
           </div>
-          <div class="muted step6" id="notes"></div>
+          <div class="muted" id="notes"></div>
         </div>
       </div>
     </section>
   </main>
 
-  <footer>© 2025 Flexblock</footer>
+  <footer>© 2025 Flexxblock</footer>
 
-  <!-- WebGL Shader -->
-  <script src="/script.js"></script>
-  <!-- App-Logik -->
+  <!-- Logik -->
   <script src="/main.js" type="module"></script>
+  <!-- WebGL Noise Shader -->
+  <script src="/script.js"></script>
 </body>
 </html>
