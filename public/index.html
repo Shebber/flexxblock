@@ -25,7 +25,16 @@
       background: var(--bg);
       color: var(--text);
       font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      -webkit-text-size-adjust: 100%;
+    }
+
+    /* WebGL Canvas Hintergrund */
+    #gl {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      display: block;
+      z-index: 0;
     }
 
     /* Header */
@@ -41,10 +50,14 @@
     }
 
     .wordmark-img {
-      height: 200px;
+      height: 48px;
       width: auto;
       margin-top: 2px;
       display: block;
+    }
+
+    @media (max-width: 480px) {
+      .wordmark-img { height: 36px; }
     }
 
     .tag {
@@ -63,6 +76,7 @@
       opacity: 0.06;
       width: min(42vw, 500px);
       pointer-events: none;
+      z-index: 1;
     }
 
     /* Layout */
@@ -166,37 +180,22 @@
       top: 16px;
       color: var(--muted);
       font-size: 12px;
+      z-index: 3;
     }
 
-    /* Mobile Layout Fixes */
     @media (max-width: 900px) {
       .grid { grid-template-columns: 1fr; }
-
-      .art {
-        width: 70vw;
-        margin: 0 auto 10px;
-      }
-
-      .card {
-        width: 90vw;
-        word-break: break-word;
-        overflow-wrap: anywhere;
-      }
-
-      .v .code {
-        white-space: normal;
-        word-break: break-all;
-      }
-    }
-
-    @media (max-width: 420px) {
-      .wordmark-img { height: 26px; }
-      .kv { grid-template-columns: 100px 1fr; }
+      .art { width: 70vw; margin: 0 auto 10px; }
+      .card { width: 90vw; word-break: break-word; overflow-wrap: anywhere; }
+      .v .code { white-space: normal; word-break: break-all; }
     }
   </style>
 </head>
 
 <body>
+  <!-- WebGL Canvas -->
+  <canvas id="gl"></canvas>
+
   <!-- Header -->
   <header>
     <img src="/assets/flexblock_wordmark_col.svg" alt="Flexblock Wordmark" class="wordmark-img" />
@@ -235,92 +234,96 @@
 
   <footer>© 2025 Flexblock</footer>
 
+  <!-- Artwork-Logik -->
+  <script src="/main.js" type="module"></script>
+
+  <!-- WebGL Noise -->
   <script>
-(function(){
-  const canvas = document.getElementById('gl');
-  const gl = canvas.getContext('webgl', { alpha:true, antialias:false });
-  if (!gl) return;
+  (function(){
+    const canvas = document.getElementById('gl');
+    const gl = canvas.getContext('webgl', { alpha:true, antialias:false });
+    if (!gl) return;
 
-  const vertSrc = `
-    attribute vec2 a;
-    void main(){ gl_Position = vec4(a, 0.0, 1.0); }
-  `;
-  const fragSrc = `
-    precision highp float;
-    uniform vec2 r;
-    uniform float t;
-    float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
-    float noise(vec2 p){
-      vec2 i = floor(p), f = fract(p);
-      float a = hash(i);
-      float b = hash(i + vec2(1.0,0.0));
-      float c = hash(i + vec2(0.0,1.0));
-      float d = hash(i + vec2(1.0,1.0));
-      vec2 u = f*f*(3.0-2.0*f);
-      return mix(a,b,u.x) + (c-a)*u.y*(1.0-u.x) + (d-b)*u.x*u.y;
+    const vertSrc = `
+      attribute vec2 a;
+      void main(){ gl_Position = vec4(a, 0.0, 1.0); }
+    `;
+    const fragSrc = `
+      precision highp float;
+      uniform vec2 r;
+      uniform float t;
+      float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
+      float noise(vec2 p){
+        vec2 i = floor(p), f = fract(p);
+        float a = hash(i);
+        float b = hash(i + vec2(1.0,0.0));
+        float c = hash(i + vec2(0.0,1.0));
+        float d = hash(i + vec2(1.0,1.0));
+        vec2 u = f*f*(3.0-2.0*f);
+        return mix(a,b,u.x) + (c-a)*u.y*(1.0-u.x) + (d-b)*u.x*u.y;
+      }
+      void main(){
+        vec2 uv = gl_FragCoord.xy / r.xy;
+        vec2 p = uv*1.4;
+        float n1 = noise(p*3.0 + vec2(0.0, t*0.3));
+        float n2 = noise(p*8.0 + vec2(t*0.2, -t*0.3));
+        float scan = sin(uv.y*1200.0 + t*18.0)*0.04;
+        float drift = noise(vec2(uv.y*40.0, t*0.8))*0.10;
+        float g = n1*0.6 + n2*0.3 + scan + drift;
+        vec3 base = vec3(0.02, 0.0, 0.06);
+        vec3 mag  = vec3(1.0, 0.0, 1.0);
+        vec3 c = base + mag * (0.25 + g*0.4);
+        vec2 d = uv-0.5; float vig = 1.0 - dot(d,d)*1.1;
+        c *= clamp(vig, 0.15, 1.0);
+        gl_FragColor = vec4(c, 1.0);
+      }
+    `;
+
+    function compile(type, src){
+      const sh = gl.createShader(type);
+      gl.shaderSource(sh, src);
+      gl.compileShader(sh);
+      return sh;
     }
-    void main(){
-      vec2 uv = gl_FragCoord.xy / r.xy;
-      vec2 p = uv*1.4;
-      float n1 = noise(p*3.0 + vec2(0.0, t*0.3));
-      float n2 = noise(p*8.0 + vec2(t*0.2, -t*0.3));
-      float scan = sin(uv.y*1200.0 + t*18.0)*0.04;
-      float drift = noise(vec2(uv.y*40.0, t*0.8))*0.10;
-      float g = n1*0.6 + n2*0.3 + scan + drift;
-      vec3 base = vec3(0.02, 0.0, 0.06);
-      vec3 mag  = vec3(1.0, 0.0, 1.0);
-      vec3 c = base + mag * (0.25 + g*0.4);
-      vec2 d = uv-0.5; float vig = 1.0 - dot(d,d)*1.1;
-      c *= clamp(vig, 0.15, 1.0);
-      gl_FragColor = vec4(c, 1.0);
+
+    const vs = compile(gl.VERTEX_SHADER, vertSrc);
+    const fs = compile(gl.FRAGMENT_SHADER, fragSrc);
+    const prog = gl.createProgram();
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    gl.linkProgram(prog);
+    gl.useProgram(prog);
+
+    const a = gl.getAttribLocation(prog, 'a');
+    const ur = gl.getUniformLocation(prog, 'r');
+    const ut = gl.getUniformLocation(prog, 't');
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(a);
+    gl.vertexAttribPointer(a, 2, gl.FLOAT, false, 0, 0);
+
+    function resize(){
+      const w = innerWidth * devicePixelRatio;
+      const h = innerHeight * devicePixelRatio;
+      if (canvas.width !== w || canvas.height !== h){
+        canvas.width = w;
+        canvas.height = h;
+        gl.viewport(0,0,w,h);
+      }
     }
-  `;
+    window.addEventListener('resize', resize);
+    resize();
 
-  function compile(type, src){
-    const sh = gl.createShader(type);
-    gl.shaderSource(sh, src);
-    gl.compileShader(sh);
-    return sh;
-  }
-  const vs = compile(gl.VERTEX_SHADER, vertSrc);
-  const fs = compile(gl.FRAGMENT_SHADER, fragSrc);
-  const prog = gl.createProgram();
-  gl.attachShader(prog, vs);
-  gl.attachShader(prog, fs);
-  gl.linkProgram(prog);
-  gl.useProgram(prog);
-
-  const a = gl.getAttribLocation(prog, 'a');
-  const ur = gl.getUniformLocation(prog, 'r');
-  const ut = gl.getUniformLocation(prog, 't');
-  const buf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(a);
-  gl.vertexAttribPointer(a, 2, gl.FLOAT, false, 0, 0);
-
-  function resize(){
-    const w = window.innerWidth * devicePixelRatio;
-    const h = window.innerHeight * devicePixelRatio;
-    if (canvas.width !== w || canvas.height !== h){
-      canvas.width = w;
-      canvas.height = h;
-      gl.viewport(0, 0, w, h);
-    }
-  }
-  window.addEventListener('resize', resize);
-  resize();
-
-  const start = performance.now();
-  (function loop(){
-    const t = (performance.now() - start) / 1000;
-    gl.uniform2f(ur, canvas.width, canvas.height);
-    gl.uniform1f(ut, t);
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
-    requestAnimationFrame(loop);
+    const start = performance.now();
+    (function loop(){
+      const t = (performance.now()-start)/1000;
+      gl.uniform2f(ur, canvas.width, canvas.height);
+      gl.uniform1f(ut, t);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      requestAnimationFrame(loop);
+    })();
   })();
-})();
-</script>
-
+  </script>
 </body>
 </html>
