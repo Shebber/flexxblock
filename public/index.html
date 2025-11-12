@@ -37,36 +37,44 @@
       z-index: 0;
     }
 
-    /* Header */
-    header {
-      position: fixed;
-      top: calc(env(safe-area-inset-top, 0px) + 16px);
-      left: 16px;
-      z-index: 3;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      filter: drop-shadow(0 0 6px rgba(255,0,255,0.3));
-    }
+     header {
+     position: fixed;
+     top: calc(env(safe-area-inset-top, 0px) + 16px);
+     left: 0;
+     right: 0;
+     z-index: 3;
+     display: flex;
+     justify-content: space-between; /* links & rechts bündig */
+     align-items: center;
+     padding: 0 16px; /* Abstand zum Rand */
+}
 
-    .wordmark-img {
+     .logo-wrap,
+     .verify-wrap {
+     display: flex;
+     align-items: center;
+}
+
+     .wordmark-img {
       height: 48px;
       width: auto;
       margin-top: 2px;
       display: block;
-    }
+}
 
-    @media (max-width: 480px) {
-      .wordmark-img { height: 100px; }
-    }
+      @media (max-width: 480px) {
+      .wordmark-img {
+      height: 140px; /* hier kannst du direkt anpassen */
+  }
+}
 
-    .tag {
-      font-weight: 400;
-      color: var(--muted);
-      border: 1px solid var(--border);
-      padding: 4px 8px;
-      border-radius: 10px;
-    }
+.tag {
+  font-weight: 400;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 10px;
+}
 
     /* Wasserzeichen */
     .icon-watermark {
