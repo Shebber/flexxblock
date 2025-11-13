@@ -1,8 +1,10 @@
 {
-  "version": 2,
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/verify/(.*)", "dest": "/index.html" },
-    { "src": "^/$", "dest": "/index.html" }
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "" }
+      ]
+    }
   ]
 }
