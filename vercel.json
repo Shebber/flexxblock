@@ -1,13 +1,17 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/api/:match*", "destination": "/api/:match*" },
+    { "source": "/verify/:id", "destination": "/" }
+  ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "Content-Security-Policy", "value": "" }
+        {
+          "key": "Content-Security-Policy",
+          "value": "script-src 'self' 'unsafe-inline' 'unsafe-eval'; object-src 'none';"
+        }
       ]
     }
-  ],
-  "cleanUrls": true,
-  "trailingSlash": false
+  ]
 }
