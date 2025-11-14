@@ -1,7 +1,7 @@
 {
   "001": {
     "title": "Hop-Starz – Acrylic Print",
-    "image": "assets/001.jpg",
+    "image": "/assets/001.jpg",
     "chain": "ApeChain",
     "contract": "0xbe0c4F7aEF79e41463bcd4e20c66FdA4e35A5a19",
     "tokenId": "#5665",
@@ -12,7 +12,7 @@
   },
   "002": {
     "title": "JNKYZ – Acrylic Print",
-    "image": "assets/002.jpg",
+    "image": "/assets/002.jpg",
     "chain": "ApeChain",
     "contract": "0xfDB917b599BA8898325373b34454385489285C10",
     "tokenId": "#264",
